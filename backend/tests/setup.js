@@ -3,10 +3,16 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
 
+jest.setTimeout(60000); // give slow first-run downloads room to breathe
+
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    instance: {
+      launchTimeout: 60000, // was defaulting to 10000ms — too short for a fresh download
+    },
+  });
   await mongoose.connect(mongoServer.getUri());
-}, 6000);
+});
 
 afterEach(async () => {
   const collections = mongoose.connection.collections;
@@ -17,5 +23,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
-}, 15000);
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+});
