@@ -11,7 +11,13 @@ const purchase = async (req, res) => {
 };
 
 const restock = async (req, res) => {
-  res.status(501).json({ message: 'Not implemented' });
+  try {
+    const vehicle = await inventoryService.restock(req.params.id, req.body.quantity);
+    res.status(200).json({ vehicle });
+  } catch (err) {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ message: err.message });
+  }
 };
 
 module.exports = { purchase, restock };

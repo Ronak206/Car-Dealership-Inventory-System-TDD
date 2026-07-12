@@ -7,8 +7,6 @@ const purchase = async (vehicleId) => {
     throw createHttpError('Invalid vehicle id format', 400);
   }
 
-  // Atomic: only decrements if quantity is currently >= 1,
-  // preventing overselling under concurrent requests.
   const vehicle = await Vehicle.findOneAndUpdate(
     { _id: vehicleId, quantity: { $gte: 1 } },
     { $inc: { quantity: -1 } },
@@ -19,8 +17,6 @@ const purchase = async (vehicleId) => {
     return vehicle;
   }
 
-  // Distinguish "doesn't exist" from "exists but out of stock"
-  // for accurate 404 vs 400 responses.
   const exists = await Vehicle.findById(vehicleId);
   if (!exists) {
     throw createHttpError('Vehicle not found', 404);
@@ -30,7 +26,25 @@ const purchase = async (vehicleId) => {
 };
 
 const restock = async (vehicleId, quantity) => {
-  // TODO: implement in next step
+  if (!mongoose.Types.ObjectId.isValid(vehicleId)) {
+    throw createHttpError('Invalid vehicle id format', 400);
+  }
+
+  if (typeof quantity !== 'number' || quantity <= 0) {
+    throw createHttpError('Quantity must be a positive number', 400);
+  }
+
+  const vehicle = await Vehicle.findByIdAndUpdate(
+    vehicleId,
+    { $inc: { quantity } },
+    { new: true, runValidators: true }
+  );
+
+  if (!vehicle) {
+    throw createHttpError('Vehicle not found', 404);
+  }
+
+  return vehicle;
 };
 
 module.exports = { purchase, restock };
