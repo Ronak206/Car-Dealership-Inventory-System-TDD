@@ -92,3 +92,92 @@ describe('GET /api/vehicles', () => {
     expect(res.body.vehicles).toEqual([]);
   });
 });
+
+// GET Search
+
+describe('GET /api/vehicles/search', () => {
+  const seedVehicles = async (token) => {
+    await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ make: 'Toyota', model: 'Corolla', category: 'Sedan', price: 20000, quantity: 5 });
+
+    await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ make: 'Toyota', model: 'Fortuner', category: 'SUV', price: 35000, quantity: 2 });
+
+    await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ make: 'Honda', model: 'Civic', category: 'Sedan', price: 22000, quantity: 3 });
+  };
+
+  it('should reject request with no token (401)', async () => {
+    const res = await request(app).get('/api/vehicles/search?make=Toyota');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should filter by make', async () => {
+    const token = await getAuthToken();
+    await seedVehicles(token);
+
+    const res = await request(app)
+      .get('/api/vehicles/search?make=Toyota')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.vehicles.length).toBe(2);
+    expect(res.body.vehicles.every(v => v.make === 'Toyota')).toBe(true);
+  });
+
+  it('should filter by category', async () => {
+    const token = await getAuthToken();
+    await seedVehicles(token);
+
+    const res = await request(app)
+      .get('/api/vehicles/search?category=SUV')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.vehicles.length).toBe(1);
+    expect(res.body.vehicles[0].category).toBe('SUV');
+  });
+
+  it('should filter by price range', async () => {
+    const token = await getAuthToken();
+    await seedVehicles(token);
+
+    const res = await request(app)
+      .get('/api/vehicles/search?minPrice=21000&maxPrice=40000')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.vehicles.length).toBe(2); // Fortuner (35000) + Civic (22000)
+  });
+
+  it('should combine multiple filters', async () => {
+    const token = await getAuthToken();
+    await seedVehicles(token);
+
+    const res = await request(app)
+      .get('/api/vehicles/search?make=Toyota&category=Sedan')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.vehicles.length).toBe(1);
+    expect(res.body.vehicles[0].model).toBe('Corolla');
+  });
+
+  it('should return empty array when no vehicles match', async () => {
+    const token = await getAuthToken();
+    await seedVehicles(token);
+
+    const res = await request(app)
+      .get('/api/vehicles/search?make=Ferrari')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.vehicles).toEqual([]);
+  });
+});
