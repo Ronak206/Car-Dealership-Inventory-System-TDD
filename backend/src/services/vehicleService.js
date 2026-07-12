@@ -54,7 +54,17 @@ const updateVehicle = async (id, updateData) => {
 };
 
 const deleteVehicle = async (id) => {
-  // TODO: implement later in Phase 3
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw createHttpError('Invalid vehicle id format', 400);
+  }
+
+  const vehicle = await Vehicle.findByIdAndDelete(id);
+
+  if (!vehicle) {
+    throw createHttpError('Vehicle not found', 404);
+  }
+
+  return vehicle;
 };
 
 module.exports = { createVehicle, getAllVehicles, searchVehicles, updateVehicle, deleteVehicle };

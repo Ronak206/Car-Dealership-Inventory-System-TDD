@@ -41,7 +41,13 @@ const updateVehicle = async (req, res) => {
 };
 
 const deleteVehicle = async (req, res) => {
-  res.status(501).json({ message: 'Not implemented' });
+  try {
+    await vehicleService.deleteVehicle(req.params.id);
+    res.status(200).json({ message: 'Vehicle deleted successfully' });
+  } catch (err) {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ message: err.message });
+  }
 };
 
 module.exports = { createVehicle, getAllVehicles, searchVehicles, updateVehicle, deleteVehicle };
