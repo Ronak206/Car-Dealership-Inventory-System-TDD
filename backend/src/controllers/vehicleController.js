@@ -11,7 +11,13 @@ const createVehicle = async (req, res) => {
 };
 
 const getAllVehicles = async (req, res) => {
-  res.status(501).json({ message: 'Not implemented' });
+  try {
+    const vehicles = await vehicleService.getAllVehicles();
+    res.status(200).json({ vehicles });
+  } catch (err) {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ message: err.message });
+  }
 };
 
 const searchVehicles = async (req, res) => {

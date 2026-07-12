@@ -12,8 +12,9 @@ const createVehicle = async (vehicleData) => {
   return vehicle;
 };
 
-const getAllVehicles = async (filters) => {
-  // TODO: implement later in Phase 3
+const getAllVehicles = async () => {
+  const vehicles = await Vehicle.find();
+  return vehicles;
 };
 
 const searchVehicles = async (query) => {
