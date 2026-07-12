@@ -1,10 +1,16 @@
+const inventoryService = require('../services/inventoryService');
+
 const purchase = async (req, res) => {
-  // TODO: implement in Phase 4
-  res.status(501).json({ message: 'Not implemented' });
+  try {
+    const vehicle = await inventoryService.purchase(req.params.id);
+    res.status(200).json({ vehicle });
+  } catch (err) {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ message: err.message });
+  }
 };
 
 const restock = async (req, res) => {
-  // TODO: implement in Phase 4
   res.status(501).json({ message: 'Not implemented' });
 };
 

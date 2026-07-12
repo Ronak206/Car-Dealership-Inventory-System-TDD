@@ -76,4 +76,4 @@ describe('POST /api/vehicles/:id/purchase', () => {
 
     expect(res.statusCode).toBe(400);
   });
-});-––
+});
