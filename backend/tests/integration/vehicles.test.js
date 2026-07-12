@@ -236,3 +236,72 @@ describe('PUT /api/vehicles/:id', () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+// DELETE
+
+describe('DELETE /api/vehicles/:id', () => {
+  it('should reject request with no token (401)', async () => {
+    const res = await request(app).delete('/api/vehicles/507f1f77bcf86cd799439011');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should reject non-admin user with 403', async () => {
+    const token = await getAuthToken('USER');
+
+    const createRes = await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ make: 'Toyota', model: 'Corolla', category: 'Sedan', price: 20000, quantity: 5 });
+
+    const vehicleId = createRes.body.vehicle._id;
+
+    const res = await request(app)
+      .delete(`/api/vehicles/${vehicleId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(403);
+  });
+
+  it('should delete vehicle with admin token (200)', async () => {
+    const adminToken = await getAuthToken('ADMIN');
+
+    const createRes = await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ make: 'Toyota', model: 'Corolla', category: 'Sedan', price: 20000, quantity: 5 });
+
+    const vehicleId = createRes.body.vehicle._id;
+
+    const res = await request(app)
+      .delete(`/api/vehicles/${vehicleId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.statusCode).toBe(200);
+
+    const getRes = await request(app)
+      .get('/api/vehicles')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(getRes.body.vehicles.find(v => v._id === vehicleId)).toBeUndefined();
+  });
+
+  it('should return 404 when vehicle does not exist', async () => {
+    const adminToken = await getAuthToken('ADMIN');
+
+    const res = await request(app)
+      .delete('/api/vehicles/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('should return 400 for invalid id format', async () => {
+    const adminToken = await getAuthToken('ADMIN');
+
+    const res = await request(app)
+      .delete('/api/vehicles/not-a-valid-id')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.statusCode).toBe(400);
+  });
+});
