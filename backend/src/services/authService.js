@@ -1,13 +1,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const createHttpError = require('../utils/httpError');
 
 const register = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    const error = new Error('Email already registered');
-    error.statusCode = 409;
-    throw error;
+    throw createHttpError('Email already registered', 409);
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -29,16 +28,12 @@ const register = async ({ name, email, password }) => {
 const login = async ({ email, password }) => {
   const user = await User.findOne({ email });
   if (!user) {
-    const error = new Error('Invalid email or password');
-    error.statusCode = 401;
-    throw error;
+    throw createHttpError('Invalid email or password', 401);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    const error = new Error('Invalid email or password');
-    error.statusCode = 401;
-    throw error;
+    throw createHttpError('Invalid email or password', 401);
   }
 
   const token = jwt.sign(
