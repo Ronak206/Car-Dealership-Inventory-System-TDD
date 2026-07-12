@@ -3,7 +3,6 @@ const app = require('../../src/app');
 const User = require('../../src/models/User');
 
 // Register Test
-
 describe('POST /api/auth/register', () => {
   it('should create a new user and return 201', async () => {
     const res = await request(app)

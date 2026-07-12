@@ -13,8 +13,14 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-  // TODO: implement in Phase 2
-  res.status(501).json({ message: 'Not implemented' });
+  try {
+    const { email, password } = req.body;
+    const { token } = await authService.login({ email, password });
+    res.status(200).json({ token });
+  } catch (err) {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({ message: err.message });
+  }
 };
 
 module.exports = { register, login };

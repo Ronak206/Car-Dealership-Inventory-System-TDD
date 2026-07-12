@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key-for-jest';
+
 let mongoServer;
 
 jest.setTimeout(60000); // give slow first-run downloads room to breathe
