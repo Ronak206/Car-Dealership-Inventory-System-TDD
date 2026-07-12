@@ -18,7 +18,21 @@ const getAllVehicles = async () => {
 };
 
 const searchVehicles = async (query) => {
-  // TODO: implement later in Phase 3
+  const { make, model, category, minPrice, maxPrice } = query;
+  const filter = {};
+
+  if (make) filter.make = make;
+  if (model) filter.model = model;
+  if (category) filter.category = category;
+
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    filter.price = {};
+    if (minPrice !== undefined) filter.price.$gte = Number(minPrice);
+    if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice);
+  }
+
+  const vehicles = await Vehicle.find(filter);
+  return vehicles;
 };
 
 const updateVehicle = async (id, updateData) => {
