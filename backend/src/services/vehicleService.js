@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Vehicle = require('../models/Vehicle');
 const createHttpError = require('../utils/httpError');
 
@@ -36,7 +37,20 @@ const searchVehicles = async (query) => {
 };
 
 const updateVehicle = async (id, updateData) => {
-  // TODO: implement later in Phase 3
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw createHttpError('Invalid vehicle id format', 400);
+  }
+
+  const vehicle = await Vehicle.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!vehicle) {
+    throw createHttpError('Vehicle not found', 404);
+  }
+
+  return vehicle;
 };
 
 const deleteVehicle = async (id) => {
