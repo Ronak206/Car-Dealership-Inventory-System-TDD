@@ -113,7 +113,6 @@ Design, build, and test a **full-stack Car Dealership Inventory System**. Tests 
 
 ## 📁 4. Project Structure
 
-```
 car-dealership/
 │
 ├── backend/
@@ -140,21 +139,29 @@ car-dealership/
 │   │   ├── middleware/
 │   │   │   └── auth.js                # verifyToken + requireAdmin
 │   │   │
-│   │   └── routes/                    # Wires HTTP method + path → controller
-│   │       ├── auth.js
-│   │       ├── vehicles.js
-│   │       └── inventory.js
+│   │   ├── routes/                    # Wires HTTP method + path → controller
+│   │   │   ├── health.js
+│   │   │   ├── auth.js
+│   │   │   ├── vehicles.js
+│   │   │   └── inventory.js
+│   │   │
+│   │   └── utils/
+│   │       └── httpError.js           # Shared HTTP error creation helper
 │   │
 │   ├── tests/
 │   │   ├── setup.js                   # Jest setup + mongodb-memory-server bootstrap
-│   │   ├── unit/                      # Tests services WITHOUT HTTP
-│   │   │   ├── authService.test.js
+│   │   ├── unit/                      # Tests services/middleware WITHOUT HTTP
+│   │   │   ├── authService.test.js    #   currently: verifyToken/requireAdmin middleware tests
 │   │   │   ├── vehicleService.test.js
 │   │   │   └── inventoryService.test.js
 │   │   └── integration/               # Full HTTP flow via Supertest
+│   │       ├── health.test.js
 │   │       ├── auth.test.js
 │   │       ├── vehicles.test.js
 │   │       └── inventory.test.js
+│   │
+│   ├── screenshots/                   # Backend TDD step screenshots (RED/GREEN/REFACTOR)
+│   │   ├── All .png
 │   │
 │   ├── .env.example                   # MONGO_URI, JWT_SECRET, PORT template
 │   ├── .gitignore
@@ -162,10 +169,10 @@ car-dealership/
 │   └── package.json
 │
 ├── frontend/                          # Phase 5+ (decided later)
-├── screenshots/                       # TDD step screenshots (like prior repo)
+│   └── screenshots/                   # Frontend UI/feature screenshots (Phase 5-6)
+│
 ├── .gitignore
 └── README.md                          # ← You are here
-```
 
 ### Why this layering (and why no repositories folder)
 
@@ -460,17 +467,17 @@ Tick these off as we go. This is your single dashboard.
 - [-] `backend/tests/setup.js`
 
 ### Phase 1 — Health Check
-- [ ] 🔴 RED: health endpoint test
-- [ ] 🟢 GREEN: implement health route
-- [ ] 🔵 REFACTOR: clean module structure
+- [-] 🔴 RED: health endpoint test
+- [-] 🟢 GREEN: implement health route
+- [-] 🔵 REFACTOR: clean module structure
 
 ### Phase 2 — Auth
-- [ ] 🔴 RED: register test
-- [ ] 🟢 GREEN: register impl
-- [ ] 🔴 RED: login test
-- [ ] 🟢 GREEN: login impl
-- [ ] 🔴 RED: protected route test
-- [ ] 🟢 GREEN: auth middleware
+- [-] 🔴 RED: register test
+- [-] 🟢 GREEN: register impl
+- [-] 🔴 RED: login test
+- [-] 🟢 GREEN: login impl
+- [-] 🔴 RED: protected route test
+- [-] 🟢 GREEN: auth middleware
 - [ ] 🔵 REFACTOR: extract authService
 
 ### Phase 3 — Vehicles CRUD
