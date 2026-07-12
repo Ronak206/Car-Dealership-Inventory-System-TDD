@@ -181,3 +181,58 @@ describe('GET /api/vehicles/search', () => {
     expect(res.body.vehicles).toEqual([]);
   });
 });
+
+// PUT
+
+describe('PUT /api/vehicles/:id', () => {
+  it('should reject request with no token (401)', async () => {
+    const res = await request(app)
+      .put('/api/vehicles/507f1f77bcf86cd799439011')
+      .send({ price: 25000 });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should update vehicle fields with valid token (200)', async () => {
+    const token = await getAuthToken();
+
+    const createRes = await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ make: 'Toyota', model: 'Corolla', category: 'Sedan', price: 20000, quantity: 5 });
+
+    const vehicleId = createRes.body.vehicle._id;
+
+    const res = await request(app)
+      .put(`/api/vehicles/${vehicleId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ price: 25000, quantity: 8 });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.vehicle.price).toBe(25000);
+    expect(res.body.vehicle.quantity).toBe(8);
+    expect(res.body.vehicle.make).toBe('Toyota'); // unchanged fields preserved
+  });
+
+  it('should return 404 when vehicle does not exist', async () => {
+    const token = await getAuthToken();
+
+    const res = await request(app)
+      .put('/api/vehicles/507f1f77bcf86cd799439011') // valid ObjectId format, doesn't exist
+      .set('Authorization', `Bearer ${token}`)
+      .send({ price: 25000 });
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('should return 400 for invalid id format', async () => {
+    const token = await getAuthToken();
+
+    const res = await request(app)
+      .put('/api/vehicles/not-a-valid-id')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ price: 25000 });
+
+    expect(res.statusCode).toBe(400);
+  });
+});
